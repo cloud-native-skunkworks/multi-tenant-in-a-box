@@ -119,7 +119,7 @@ local-path-storage   local-path-provisioner-5b94755fb4-d5fz8   1/1     Running  
 ### Now to install a tenant k3s VMI
 
 ```
-gcloud compute scp tenant.yaml multi-tenant:~/tenant.yaml`
+gcloud compute scp tenant.yaml multi-tenant:~/tenant.yaml
 gcp compute ssh multi-tenant
 kubectl apply -f tenant.yaml
 ```
