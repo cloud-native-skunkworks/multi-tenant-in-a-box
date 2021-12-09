@@ -3,6 +3,7 @@
 sudo apt-get install qemu-kvm libvirt-daemon-system libvirt-clients bridge-utils
 sudo adduser `id -un` libvirtd
 sudo modprobe -a kvm
+newgrp kvm
 # ----------------------------------------------------
 cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
 br_netfilter
