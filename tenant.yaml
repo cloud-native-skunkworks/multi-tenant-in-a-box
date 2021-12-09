@@ -1,14 +1,14 @@
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
-  name: testvm
+  name: tenant-0
 spec:
-  running: false
+  running: true
   template:
     metadata:
       labels:
         kubevirt.io/size: small
-        kubevirt.io/domain: testvm
+        kubevirt.io/domain: k8s-tenant
     spec:
       domain:
         devices:
@@ -34,7 +34,6 @@ spec:
             image: quay.io/kubevirt/cirros-container-disk-demo
         - name: cloudinitdisk
           cloudInitNoCloud:
-            userDataBase64: SGkuXG4=
             userData: |
-               runcmd:
-                 - curl -sfL https://get.k3s.io | sh -
+                    runcmd:
+                     - curl -sfL https://get.k3s.io | sh -
