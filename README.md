@@ -2,32 +2,31 @@
 
 This project is designed to explore the nested virtualisation feature enabled within GCE Haswell based process families ( [see more](https://cloud.google.com/compute/docs/instances/nested-virtualization/overview)).
 
+![virt](images/virt.png)
 
 ## GCE Creation
 
 ```
-❯  gcloud compute instances create multi-tenant \
+gcloud compute instances create multi-tenant \
   --enable-nested-virtualization \
   --zone=europe-west2-a \
-  --min-cpu-platform="Intel Haswell"  --custom-cpu=4 --custom-memory=12
-
-NAME          ZONE            MACHINE_TYPE    PREEMPTIBLE  INTERNAL_IP  EXTERNAL_IP    STATUS
-multi-tenant  europe-west2-a  custom-4-12288               10.154.0.2   35.246.121.96  RUNNING
+  --min-cpu-platform="Intel Haswell"  --custom-cpu=4 --custom-memory=12 --create-disk=auto-delete=yes,boot=yes,device-name=multi-tenant,image=projects/ubuntu-os-cloud/global/images/ubuntu-1804-bionic-v20211206
 ```
 
 ## Installer
 
-`gcloud compute scp install.sh multi-tenant:~/install.sh`
+```
+gcloud compute scp install.sh multi-tenant:~/install.sh`
+gcloud compute ssh multi-tenant`
 
-`gcloud compute ssh multi-tenant`
-
-_Run the ./install.sh_
-
+# Run the installer
+./install.sh
+```
 
 ## Post-install
 
 ```
-kubeadm init --pod-network-cidr=10.244.0.0/16
+sudo kubeadm init --pod-network-cidr=10.244.0.0/16
 # ----------------------------------------------------
 mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
@@ -36,6 +35,12 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl taint nodes multi-tenant node-role.kubernetes.io/master:NoSchedule-
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+# ----------------------------------------------------
+export VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases | grep tag_name | grep -v -- '-rc' | sort -r | head -1 | awk -F': ' '{print $2}' | sed 's/,//' | xargs)
+echo $VERSION
+kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-operator.yaml
+
+kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-cr.yaml
 # ----------------------------------------------------
 cat << END > enable-feature-gate.yaml
 ---
@@ -54,7 +59,7 @@ END
 kubectl apply -f enable-feature-gate.yaml
 ```
 
-### Valdiate our host cluster
+### Valdiate our host cluster control-plane
 
 ```
 root@multi-tenant:/home/alexjones# kubectl get pods --all-namespaces
