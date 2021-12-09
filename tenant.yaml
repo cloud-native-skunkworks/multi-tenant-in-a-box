@@ -24,7 +24,7 @@ spec:
             masquerade: {}
         resources:
           requests:
-            memory: 64M
+            memory: 512M
       networks:
       - name: default
         pod: {}
@@ -35,3 +35,7 @@ spec:
         - name: cloudinitdisk
           cloudInitNoCloud:
             userDataBase64: SGkuXG4=
+            userData: |
+            runcmd:
+              - curl -sfL https://get.k3s.io | sh -
+#              - mkdir -p /var/lib/rancher/k3s/server/manifests
