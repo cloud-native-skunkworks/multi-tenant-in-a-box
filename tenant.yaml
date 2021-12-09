@@ -31,9 +31,14 @@ spec:
       volumes:
         - name: containerdisk
           containerDisk:
-            image: quay.io/kubevirt/cirros-container-disk-demo
+            image: tedezed/ubuntu-container-disk:latest
         - name: cloudinitdisk
           cloudInitNoCloud:
-            userData: |
-                    runcmd:
-                     - curl -sfL https://get.k3s.io | sh -
+            userData: |-
+              #cloud-config
+              chpasswd:
+                list: |
+                  ubuntu:ubuntu
+                expire: False
+              runcmd:
+               - curl -sfL https://get.k3s.io | sh -

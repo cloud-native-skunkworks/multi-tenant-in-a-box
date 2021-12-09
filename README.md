@@ -16,8 +16,8 @@ gcloud compute instances create multi-tenant \
 ## Installer 🚀
 
 ```
-gcloud compute scp install.sh multi-tenant:~/install.sh`
-gcloud compute ssh multi-tenant`
+gcloud compute scp install.sh multi-tenant:~/install.sh
+gcloud compute ssh multi-tenant
 
 # Run the installer
 ./install.sh
@@ -65,7 +65,7 @@ kubectl apply -f enable-feature-gate.yaml
 sudo ln -s /usr/bin/kvm /usr/libexec/qemu-kvm
 ```
 
-Then edit apparmor to add the following 
+Then edit apparmor to add the following `vim /etc/apparmor.d/usr.sbin.libvirtd`
 ```
   /usr/lib/xen-*/bin/libxl-save-helper PUx,
   /usr/lib/xen-*/bin/pygrub PUx,
